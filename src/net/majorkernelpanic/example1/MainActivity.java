@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 import android.net.Uri;
@@ -46,8 +47,12 @@ public class MainActivity extends Activity {
 	Uri uriVideo = null;
 	VideoView videoviewPlay;
 	
+	//Creating servlet variables
+	MyHttpServer server;
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.activity_main);
@@ -92,10 +97,7 @@ public class MainActivity extends Activity {
 		editor.putString(RtspServer.KEY_PORT, String.valueOf(1234));
 		editor.commit();
 
-		
-		
-		
-		
+
 		// Configures the SessionBuilder
 		SessionBuilder.getInstance()
 		.setSurfaceView(mSurfaceView)
@@ -105,12 +107,19 @@ public class MainActivity extends Activity {
 		.setAudioEncoder(SessionBuilder.AUDIO_AMRNB)
 		.setVideoEncoder(SessionBuilder.VIDEO_H264);
 		
-		
-		
 		// Starts the RTSP server
 		this.startService(new Intent(this,RtspServer.class));
 
+		
+		//Servlet Code
+        server=new MyHttpServer(MainActivity.this);
+        server.start();
 	}
 	
-
+	@Override
+    protected void onDestroy() 
+    {    
+        super.onDestroy();
+        server.stop();
+    }
 }
